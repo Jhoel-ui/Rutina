@@ -1,0 +1,13 @@
+{
+  "appId": "com.rodri.rutina",
+  "appName": "Rutina",
+  "webDir": "www",
+  "android": {
+    "adjustMarginsForEdgeToEdge": "force"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "iconColor": "#1f8bff"
+    }
+  }
+}
