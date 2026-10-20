@@ -414,17 +414,44 @@ const SCHEDULE_DEFAULT=[
   {t:'21:45',n:'Repaso o tarea ligera: 30 minutos',m:'Lo que no acabaste en la mañana',k:'habito'},
   {t:'22:20',n:'Planear mañana: tus 3 de hoy',m:'5 minutos',k:'habito'},
   {t:'23:30',n:'Celular fuera y a dormir',m:'Para despertar bien a las 9:30',k:'habito'}
-];
+].concat(WEEKEND_DEFAULT());
+function WEEKEND_DEFAULT(){return [
+  {d:[6],t:'08:45',n:'Despertar y dejar el celular lejos',m:'Hoy tienes clases a las 11:10',k:'habito'},
+  {d:[6],t:'09:00',n:'Aseo, vestirme y desayunar',m:'',k:'habito'},
+  {d:[6],t:'09:45',n:'Alistar mochila y materiales',m:'',k:'habito'},
+  {d:[6],t:'10:10',n:'Salir a clases',m:'Clases de 11:10 a 13:00',k:'oblig',key:true},
+  {d:[6],t:'11:10',n:'Clases',m:'Hasta las 13:00',k:'oblig',aviso:false},
+  {d:[6],t:'13:00',n:'Almorzar y descansar',m:'',k:'base',aviso:false},
+  {d:[6],t:'14:30',n:'Salir al curso de Exploradores del Rey',m:'Empieza a las 15:00',k:'oblig',key:true},
+  {d:[6],t:'15:00',n:'Exploradores del Rey',m:'',k:'oblig',aviso:false},
+  {d:[6],t:'18:30',n:'Culto de jóvenes',m:'Revisa si te toca ministerio',k:'oblig',key:true},
+  {d:[6],t:'22:30',n:'Planear el domingo',m:'Iglesia o visitas a las 9:00',k:'habito'},
+  {d:[6],t:'23:30',n:'Celular fuera y a dormir',m:'Mañana madrugas',k:'habito'},
+  {d:[0],t:'07:30',n:'Despertar y dejar el celular lejos',m:'Iglesia o visitas a las 9:00',k:'habito'},
+  {d:[0],t:'07:45',n:'Aseo, vestirme y desayunar',m:'',k:'habito'},
+  {d:[0],t:'08:30',n:'Salir a la iglesia',m:'Iglesia o visitas hasta las 12:00',k:'oblig',key:true},
+  {d:[0],t:'09:00',n:'Iglesia o visitas a otras iglesias',m:'Hasta las 12:00',k:'oblig',aviso:false},
+  {d:[0],t:'12:00',n:'Almuerzo y tiempo libre',m:'Te lo ganaste',k:'libre',aviso:false},
+  {d:[0],t:'16:00',n:'Tarea y repaso: 1 hora',m:'Adelanta lo de la semana',k:'habito'},
+  {d:[0],t:'20:00',n:'Revisión semanal: 15 minutos',m:'Mira tu progreso y elige tus metas de la semana',k:'habito'},
+  {d:[0],t:'23:00',n:'Celular fuera y a dormir',m:'Mañana es lunes',k:'habito'}
+]}
+const WEEKDAYS=[1,2,3,4,5];
+const blkDays=x=>Array.isArray(x.d)&&x.d.length?x.d:WEEKDAYS;
+const GROUPS={lv:{w:'Lunes a viernes',d:WEEKDAYS},s:{w:'Sábado',d:[6]},dom:{w:'Domingo',d:[0]}};
+const groupOf=wd=>wd===6?'s':wd===0?'dom':'lv';
+let schedGroup=groupOf(new Date().getDay());
 const toMin=t=>{const [h,m]=String(t||'0:0').split(':').map(Number);return (h||0)*60+(m||0)};
 const fmtDur=n=>n>=60?Math.floor(n/60)+' h'+(n%60?' '+(n%60)+' min':''):n+' min';
 let schedOpen=false;
 function scheduleView(){
-  if(!profile.schedule) return '<div class="section"><div class="sechead"><h2>Tu horario</h2></div><div class="now chamfer"><div class="k">Nuevo</div><div class="n">Tu horario de lunes a viernes está listo</div><div class="m">Armado con lo que me contaste: salir a las 11:50, clases de 13:00 a 18:10, internet hasta las 20:30 y 30 minutos de repaso en la noche.</div><div class="btns" style="justify-content:flex-start;margin-top:10px"><button class="btn chamfer" data-act="use-schedule">Usar este horario</button></div></div></div>';
-  const sch=profile.schedule.slice().sort((a,b)=>toMin(a.t)-toMin(b.t));
-  const now=new Date(), wd=now.getDay(), weekend=wd===0||wd===6, nm=now.getHours()*60+now.getMinutes();
+  if(profile.schedule&&!profile.weekendAdded&&!profile.schedule.some(x=>Array.isArray(x.d))){profile.schedule=profile.schedule.concat(WEEKEND_DEFAULT());profile.weekendAdded=true;saveProfile();setTimeout(scheduleNotifs,0)}
+  if(!profile.schedule) return '<div class="section"><div class="sechead"><h2>Tu horario</h2></div><div class="now chamfer"><div class="k">Nuevo</div><div class="n">Tu horario de toda la semana está listo</div><div class="m">Armado con lo que me contaste: de lunes a viernes sales a las 11:50 y vuelves del internet a las 20:30; el sábado clases, Exploradores y culto; el domingo iglesia.</div><div class="btns" style="justify-content:flex-start;margin-top:10px"><button class="btn chamfer" data-act="use-schedule">Usar este horario</button></div></div></div>';
+  const now=new Date(), wd=now.getDay(), nm=now.getHours()*60+now.getMinutes();
+  const sch=profile.schedule.filter(x=>blkDays(x).includes(wd)).sort((a,b)=>toMin(a.t)-toMin(b.t)), weekend=!sch.length;
   let cur=-1; sch.forEach((x,i)=>{if(toMin(x.t)<=nm)cur=i});
   let banner='';
-  if(weekend) banner='<div class="now chamfer"><div class="k">Fin de semana</div><div class="n">Hoy no hay horario fijo</div><div class="m">Tu horario es de lunes a viernes. Aprovecha para adelantar tareas o descansar.</div></div>';
+  if(weekend) banner='<div class="now chamfer"><div class="k">'+DAYS_LONG[wd]+'</div><div class="n">Hoy no hay horario fijo</div><div class="m">Puedes agregar bloques para este día en Metas, en «Tu horario».</div></div>';
   else{
     const nextKey=sch.find(x=>x.key&&toMin(x.t)>nm), left=nextKey?toMin(nextKey.t)-nm:null;
     if(nextKey&&left<=90) banner='<div class="now go chamfer"><div class="k">Faltan '+fmtDur(left)+'</div><div class="n">'+esc(nextKey.n)+' a las '+esc(nextKey.t)+'</div><div class="m">'+esc(nextKey.m||'')+'</div></div>';
@@ -438,10 +465,10 @@ function scheduleView(){
   return '<div class="section"><div class="sechead"><h2>Tu horario</h2><button class="link" data-act="edit-schedule">Editar</button></div>'+banner+'<div class="tl">'+rows+'</div>'+more+'</div>';
 }
 function scheduleEditor(){
-  const sch=profile.schedule||[];
   if(!profile.schedule) return '<p class="muted small">Aún no tienes horario. Actívalo desde Hoy.</p>';
-  return '<div class="legend">'+KINDS.map(k=>'<span class="k-'+k+'"><i></i>'+KIND_W[k]+'</span>').join('')+'</div>'+
-    '<div>'+sch.map((x,i)=>'<div class="srow k-'+(x.k||'base')+'"><button class="kbtn" data-act="sched-kind" data-i="'+i+'" aria-label="Tipo: '+KIND_W[x.k||'base']+'. Toca para cambiar"></button><input type="time" id="s-t-'+i+'" data-sched="t" data-i="'+i+'" value="'+esc(x.t)+'" aria-label="Hora"><input id="s-n-'+i+'" data-sched="n" data-i="'+i+'" value="'+esc(x.n)+'" maxlength="60" aria-label="Actividad"><button class="bell'+(x.aviso===false?'':' on')+'" data-act="sched-bell" data-i="'+i+'" aria-pressed="'+(x.aviso!==false)+'" aria-label="Aviso para '+esc(x.n)+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 16V11a6 6 0 1112 0v5l1.5 2h-15zM10 21h4"/></svg></button><button class="del" data-act="sched-del" data-i="'+i+'" aria-label="Quitar '+esc(x.n)+'">Quitar</button></div>').join('')+'</div>'+
+  const G=GROUPS[schedGroup], sch=profile.schedule.map((x,i)=>[x,i]).filter(([x])=>blkDays(x).some(d=>G.d.includes(d))).sort((a,b)=>toMin(a[0].t)-toMin(b[0].t));
+  return '<div class="chips" role="group" aria-label="Día">'+Object.keys(GROUPS).map(g=>'<button class="chip c4'+(g===schedGroup?' on':'')+'" data-act="sched-group" data-g="'+g+'" aria-pressed="'+(g===schedGroup)+'">'+GROUPS[g].w+'</button>').join('')+'</div><div class="legend">'+KINDS.map(k=>'<span class="k-'+k+'"><i></i>'+KIND_W[k]+'</span>').join('')+'</div>'+
+    '<div>'+sch.map(([x,i])=>'<div class="srow k-'+(x.k||'base')+'"><button class="kbtn" data-act="sched-kind" data-i="'+i+'" aria-label="Tipo: '+KIND_W[x.k||'base']+'. Toca para cambiar"></button><input type="time" id="s-t-'+i+'" data-sched="t" data-i="'+i+'" value="'+esc(x.t)+'" aria-label="Hora"><input id="s-n-'+i+'" data-sched="n" data-i="'+i+'" value="'+esc(x.n)+'" maxlength="60" aria-label="Actividad"><button class="bell'+(x.aviso===false?'':' on')+'" data-act="sched-bell" data-i="'+i+'" aria-pressed="'+(x.aviso!==false)+'" aria-label="Aviso para '+esc(x.n)+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 16V11a6 6 0 1112 0v5l1.5 2h-15zM10 21h4"/></svg></button><button class="del" data-act="sched-del" data-i="'+i+'" aria-label="Quitar '+esc(x.n)+'">Quitar</button></div>').join('')+(sch.length?'':'<p class="muted small">Sin bloques para este día.</p>')+'</div>'+
     '<div class="btns" style="justify-content:space-between;margin-top:6px"><button class="del" data-act="sched-reset">Volver al sugerido</button><button class="btn chamfer" data-act="sched-add">+ Agregar bloque</button></div>'+
     notifCard()+'<p class="hint">Toca el círculo de color para cambiar el tipo y la campana para activar o quitar su aviso. Las horas con ⏰ son las que no puedes pasar: ponles alarma en tu celular.</p>';
 }
@@ -493,7 +520,7 @@ function viewGoals(){
   html+='</div>';
   const dg=profile.doneGoals||[];
   if(dg.length) html+='<div class="section"><h2>Cumplidas</h2><div class="done-list">'+dg.map(g=>'<span class="chamfer">'+esc(g.title)+'</span>').join('')+'</div></div>';
-  html+='<div class="section" id="sched-edit"><div class="sechead"><h2>Tu horario</h2><span class="tag">Lunes a viernes</span></div>'+scheduleEditor()+'</div>';
+  html+='<div class="section" id="sched-edit"><div class="sechead"><h2>Tu horario</h2><span class="tag">Toda la semana</span></div>'+scheduleEditor()+'</div>';
   html+='<div class="section"><div class="sechead"><h2>Tus misiones diarias</h2><span class="tag">'+activeHabits().length+'/'+MAX_HABITS+'</span></div>'+habitEditor()+'</div>';
   return html+END;
 }
@@ -603,7 +630,8 @@ function act(b){
   else if(a==='sched-bell'){const x=profile.schedule[+b.dataset.i];x.aviso=x.aviso===false;saveProfile();render();scheduleNotifs();return}
   else if(a==='sched-kind'){const x=profile.schedule[+b.dataset.i];x.k=KINDS[(KINDS.indexOf(x.k||'base')+1)%KINDS.length];saveProfile();render();return}
   else if(a==='sched-del'){profile.schedule.splice(+b.dataset.i,1);saveProfile();render();return}
-  else if(a==='sched-add'){const last=profile.schedule.reduce((m,x)=>Math.max(m,toMin(x.t)),0)+30;profile.schedule.push({t:String(Math.floor(last/60)%24).padStart(2,'0')+':'+String(last%60).padStart(2,'0'),n:'Nuevo bloque',m:'',k:'habito'});saveProfile();render();const f=$('#s-n-'+(profile.schedule.length-1));if(f){f.focus();f.select()}return}
+  else if(a==='sched-group'){schedGroup=b.dataset.g;render();return}
+  else if(a==='sched-add'){const G=GROUPS[schedGroup];const last=profile.schedule.filter(x=>blkDays(x).some(d=>G.d.includes(d))).reduce((m,x)=>Math.max(m,toMin(x.t)),0)+30;profile.schedule.push({d:G.d.slice(),t:String(Math.floor(last/60)%24).padStart(2,'0')+':'+String(last%60).padStart(2,'0'),n:'Nuevo bloque',m:'',k:'habito'});saveProfile();render();const f=$('#s-n-'+(profile.schedule.length-1));if(f){f.focus();f.select()}return}
   else if(a==='sched-reset'){applyDefaultSchedule();saveProfile();render();toast('Horario sugerido restaurado');scheduleNotifs();return}
   else if(a==='notif-test'){testNotif();return}
   else if(a==='notif-exact'){openExactSetting();return}
@@ -683,11 +711,10 @@ async function scheduleNotifs(){
     if(p.display!=='granted'||!profile.schedule){notifInfo.count=0;return}
     const list=[]; let id=1;
     const add=(title,body,wd,min)=>list.push({id:id++,title,body,channelId:'rutina',schedule:{on:{weekday:wd,hour:Math.floor(min/60)%24,minute:min%60},allowWhileIdle:true}});
-    const dias=(lsGet('rutina.remote')||{}).dias||[1,2,3,4,5];
     profile.schedule.forEach(x=>{
       if(x.aviso===false) return;
       const m=toMin(x.t);
-      dias.forEach(d=>{
+      blkDays(x).forEach(d=>{
         const wd=d+1; // Capacitor: 1 = domingo
         add(x.n,x.m||'Toca para abrir tu rutina',wd,m);
         if(x.key&&m>=10) add('En 10 min: '+x.n,'Ve alistándote',wd,m-10);

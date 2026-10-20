@@ -1,8 +1,5 @@
 {
-  "version": 1,
-  "nota": "Horario de lunes a viernes",
-  "dias": [1, 2, 3, 4, 5],
-  "bloques": [
+  "version": 2, "nota": "Claude agregó tu sábado y domingo", "bloques": [
     {"t": "09:30", "n": "Despertar y dejar el celular lejos", "m": "Máximo 10 minutos en la cama", "k": "habito"},
     {"t": "09:45", "n": "Tender la cama, aseo y vestirme", "m": "Con tu música de piano de fondo", "k": "habito"},
     {"t": "10:15", "n": "Tarea: 45 minutos sin celular", "m": "Lo más difícil primero", "k": "oblig"},
@@ -11,10 +8,29 @@
     {"t": "11:50", "n": "Salir de casa", "m": "Saliendo a esta hora llegas con tiempo", "k": "oblig", "key": true},
     {"t": "13:00", "n": "Clases", "m": "Hasta las 18:10", "k": "oblig", "aviso": false},
     {"t": "18:10", "n": "Internet: jugar", "m": "Tu tiempo libre, sin culpa", "k": "libre", "aviso": false},
-    {"t": "20:30", "n": "Volver a casa", "m": "Hora de regresar", "k": "oblig", "key": true},
+    {"t": "20:30", "n": "Volver a casa", "m": "Pon alarma a las 20:20", "k": "oblig", "key": true},
     {"t": "21:00", "n": "Cenar y descansar", "m": "", "k": "base", "aviso": false},
     {"t": "21:45", "n": "Repaso o tarea ligera: 30 minutos", "m": "Lo que no acabaste en la mañana", "k": "habito"},
     {"t": "22:20", "n": "Planear mañana: tus 3 de hoy", "m": "5 minutos", "k": "habito"},
-    {"t": "23:30", "n": "Celular fuera y a dormir", "m": "Para despertar bien a las 9:30", "k": "habito"}
+    {"t": "23:30", "n": "Celular fuera y a dormir", "m": "Para despertar bien a las 9:30", "k": "habito"},
+    {"d": [6], "t": "08:45", "n": "Despertar y dejar el celular lejos", "m": "Hoy tienes clases a las 11:10", "k": "habito"},
+    {"d": [6], "t": "09:00", "n": "Aseo, vestirme y desayunar", "m": "", "k": "habito"},
+    {"d": [6], "t": "09:45", "n": "Alistar mochila y materiales", "m": "", "k": "habito"},
+    {"d": [6], "t": "10:10", "n": "Salir a clases", "m": "Clases de 11:10 a 13:00", "k": "oblig", "key": true},
+    {"d": [6], "t": "11:10", "n": "Clases", "m": "Hasta las 13:00", "k": "oblig", "aviso": false},
+    {"d": [6], "t": "13:00", "n": "Almorzar y descansar", "m": "", "k": "base", "aviso": false},
+    {"d": [6], "t": "14:30", "n": "Salir al curso de Exploradores del Rey", "m": "Empieza a las 15:00", "k": "oblig", "key": true},
+    {"d": [6], "t": "15:00", "n": "Exploradores del Rey", "m": "", "k": "oblig", "aviso": false},
+    {"d": [6], "t": "18:30", "n": "Culto de jóvenes", "m": "Revisa si te toca ministerio", "k": "oblig", "key": true},
+    {"d": [6], "t": "22:30", "n": "Planear el domingo", "m": "Iglesia o visitas a las 9:00", "k": "habito"},
+    {"d": [6], "t": "23:30", "n": "Celular fuera y a dormir", "m": "Mañana madrugas", "k": "habito"},
+    {"d": [0], "t": "07:30", "n": "Despertar y dejar el celular lejos", "m": "Iglesia o visitas a las 9:00", "k": "habito"},
+    {"d": [0], "t": "07:45", "n": "Aseo, vestirme y desayunar", "m": "", "k": "habito"},
+    {"d": [0], "t": "08:30", "n": "Salir a la iglesia", "m": "Iglesia o visitas hasta las 12:00", "k": "oblig", "key": true},
+    {"d": [0], "t": "09:00", "n": "Iglesia o visitas a otras iglesias", "m": "Hasta las 12:00", "k": "oblig", "aviso": false},
+    {"d": [0], "t": "12:00", "n": "Almuerzo y tiempo libre", "m": "Te lo ganaste", "k": "libre", "aviso": false},
+    {"d": [0], "t": "16:00", "n": "Tarea y repaso: 1 hora", "m": "Adelanta lo de la semana", "k": "habito"},
+    {"d": [0], "t": "20:00", "n": "Revisión semanal: 15 minutos", "m": "Mira tu progreso y elige tus metas de la semana", "k": "habito"},
+    {"d": [0], "t": "23:00", "n": "Celular fuera y a dormir", "m": "Mañana es lunes", "k": "habito"}
   ]
 }
